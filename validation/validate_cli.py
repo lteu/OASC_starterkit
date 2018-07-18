@@ -7,7 +7,7 @@ import json
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 from aslib_scenario.aslib_scenario import ASlibScenario
-from validation.validate import Validator
+from validate import Validator
 
 if __name__ == "__main__":
 

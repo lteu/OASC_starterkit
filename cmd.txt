@@ -1,0 +1,1 @@
+python3 validation/validate_cli.py --result_fn data/sunny/fkvar/Magnus.json --test_as data/oasc_test_data/Magnus/ --train_as data/oasc_scenarios/train/Magnus
