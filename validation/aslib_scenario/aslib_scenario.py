@@ -7,7 +7,6 @@ import arff  # liac-arff
 import copy
 import collections
 
-import sklearn
 import pandas as pd
 import numpy as np
 

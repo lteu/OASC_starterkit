@@ -2,7 +2,7 @@
 # License: BSD
 
 import logging
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="INFO")
 import json
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
