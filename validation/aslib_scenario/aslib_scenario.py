@@ -259,7 +259,7 @@ class ASlibScenario(object):
             dn: str
                 directory name with ASlib files
         '''
-        self.logger.info("Read ASlib scenario: %s" % (dn))
+        self.logger.debug("Read ASlib scenario: %s" % (dn))
 
         cachepath = self.cache_folder()
         # tong start
@@ -273,7 +273,7 @@ class ASlibScenario(object):
             cachefile = cachepath+"/train_"+scenario_name+".json"
 
         if not os.path.exists(cachefile):
-            print ("read and create cache files")
+            self.logger.debug("read and create cache files "+cachefile)
             self.dir_ = dn
             self.find_files()
             self.read_files()
@@ -283,7 +283,7 @@ class ASlibScenario(object):
 
             self.cacheSelf(cachefile)
         else:
-            print ("load from cache")
+            self.logger.debug("load cache file "+cachefile)
             self.loadSelf(cachefile)
 
     def find_files(self):

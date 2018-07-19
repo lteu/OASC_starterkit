@@ -23,6 +23,7 @@ class Stats(object):
                 whether objective has to be maxmized (true)
                 or minimized (false)
         '''
+        # self.incInstTest = False
         self.par1 = 0.0
         self.par10 = 0.0
         self.timeouts = 0
@@ -89,18 +90,18 @@ class Stats(object):
 
         print(">>>>>>>>>>>>>>>>>>>>>")
         
-        
+        self.logger.debug("System: %.4f" %(par10 / n_samples))
+        self.logger.debug("Oracle: %.4f" %(self.oracle_par10 / n_samples))
+        self.logger.debug("SBS: %.4f" %(self.sbs_par10 / n_samples))
         if self.maximize:
             self.logger.info("Gap closed: %.4f" %((par10 - self.sbs_par10) / (self.oracle_par10 - self.sbs_par10)))
             print ('---')
-            self.logger.info("Gap remaining: %.4f" %((self.oracle_par10 - par10) / (self.oracle_par10 - self.sbs_par10)))
+            self.logger.debug("Gap remaining: %.4f" %((self.oracle_par10 - par10) / (self.oracle_par10 - self.sbs_par10)))
         else:
             self.logger.info("Gap closed: %.4f" %((self.sbs_par10 - par10) / (self.sbs_par10 - self.oracle_par10)))
             print ('---')
-            self.logger.info("Gap remaining: %.4f" %((par10 - self.oracle_par10) / (self.sbs_par10 - self.oracle_par10)))
-        self.logger.info("System: %.4f" %(par10 / n_samples))
-        self.logger.info("Oracle: %.4f" %(self.oracle_par10 / n_samples))
-        self.logger.info("SBS: %.4f" %(self.sbs_par10 / n_samples))
+            self.logger.debug("Gap remaining: %.4f" %((par10 - self.oracle_par10) / (self.sbs_par10 - self.oracle_par10)))
+        
 
 class Validator(object):
 
@@ -182,7 +183,7 @@ class Validator(object):
                 if solved and used_time < test_scenario.algorithm_cutoff_time:
                     stat.solved += 1
                     stat.par1 += used_time
-                    self.logger.info("Solved after %f" %(used_time))
+                    self.logger.debug("Solved after %f" %(used_time))
                     break
                 elif used_time >= test_scenario.algorithm_cutoff_time:
                     stat.timeouts += 1
