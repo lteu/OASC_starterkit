@@ -7,6 +7,7 @@ import arff  # liac-arff
 import copy
 import collections
 
+import json
 import pandas as pd
 import numpy as np
 
@@ -73,7 +74,7 @@ class ASlibScenario(object):
             "cv.arff": self.read_cv
         }
 
-        self.CHECK_VALID = True
+        self.CHECK_VALID = True # Tony: mandatory
 
     def __getstate__(self):
         '''
@@ -169,6 +170,86 @@ class ASlibScenario(object):
         if self.CHECK_VALID:
             self.check_data()
 
+
+    def cache_folder(self):
+        root_arr = os.path.realpath(__file__).split('/')[:-2]
+        root = '/'.join(root_arr)
+        dirpath = root+"/cache"
+        if not os.path.exists(dirpath):
+            os.makedirs(dirpath)
+
+        return dirpath
+    def cacheSelf(self,cachefile):
+        data ={}
+
+        data['scenario'] = self.scenario  # string
+        data['performance_measure'] = self.performance_measure
+        data['performance_type'] = self.performance_type
+        data['maximize'] = self.maximize
+        data['algorithm_cutoff_time'] = self.algorithm_cutoff_time
+        data['algorithm_cutoff_memory'] = self.algorithm_cutoff_memory
+        data['features_cutoff_time'] = self.features_cutoff_time
+        data['features_cutoff_memory'] = self.features_cutoff_memory
+        data['features_deterministic'] = self.features_deterministic 
+        data['features_stochastic'] = self.features_stochastic   # list of strings
+        data['algorithms'] = self.algorithms   # list of strings
+        data['algortihms_deterministics'] = self.algortihms_deterministics   # list of strings
+        data['algorithms_stochastic'] = self.algorithms_stochastic   # list of strings
+        data['feature_group_dict'] = self.feature_group_dict   # string -> [] of strings
+        data['feature_steps'] = self.feature_steps 
+        data['feature_steps_default'] = self.feature_steps_default 
+
+        # extracted in other files
+        data['features'] = self.features 
+        data['ground_truths'] = self.ground_truths   # type -> [values]
+        data['feature_data'] = self.feature_data.to_json()
+        data['performance_data'] = self.performance_data.to_json()
+        data['performance_data_all'] = [x.to_json() for x in self.performance_data_all]
+        data['runstatus_data'] = self.runstatus_data.to_json() 
+        data['feature_cost_data'] = self.feature_cost_data.to_json() if self.feature_cost_data is not None else None
+        data['feature_runstatus_data'] = self.feature_runstatus_data.to_json() 
+        data['ground_truth_data'] = self.ground_truth_data 
+        data['cv_data'] = self.cv_data 
+        data['instances'] = self.instances   # list
+        data['found_files'] = self.found_files 
+        with open(cachefile, 'w') as outfile:
+            json.dump(data, outfile)
+
+    def loadSelf(self,cachefile):
+        with open(cachefile) as data_file:
+            data = json.load(data_file)
+
+            self.scenario = data['scenario']   # string
+            self.performance_measure = data['performance_measure'] 
+            self.performance_type = data['performance_type'] 
+            self.maximize = data['maximize']
+            self.algorithm_cutoff_time = data['algorithm_cutoff_time'] 
+            self.algorithm_cutoff_memory = data['algorithm_cutoff_memory'] 
+            self.features_cutoff_time = data['features_cutoff_time'] 
+            self.features_cutoff_memory = data['features_cutoff_memory']
+            self.features_deterministic  = data['features_deterministic']
+            self.features_stochastic = data['features_stochastic']  # list of strings
+            self.algorithms = data['algorithms']    # list of strings
+            self.algortihms_deterministics = data['algortihms_deterministics']    # list of strings
+            self.algorithms_stochastic = data['algorithms_stochastic']    # list of strings
+            self.feature_group_dict = data['feature_group_dict']    # string -> [] of strings
+            self.feature_steps  = data['feature_steps'] 
+            self.feature_steps_default  = data['feature_steps_default'] 
+
+            # extracted in other files
+            self.features = data['features']  
+            self.ground_truths = data['ground_truths']    # type -> [values]
+            self.feature_data = pd.read_json(data['feature_data'])
+            self.performance_data = pd.read_json(data['performance_data'])
+            self.performance_data_all =  [pd.read_json(x) for x in data['performance_data_all']]
+            self.runstatus_data = pd.read_json(data['runstatus_data']) 
+            self.feature_cost_data = pd.read_json(data['feature_cost_data']) if data['feature_cost_data'] else None
+            self.feature_runstatus_data = pd.read_json(data['feature_runstatus_data']) 
+            self.ground_truth_data  = data['ground_truth_data']
+            self.cv_data = data['cv_data'] 
+            self.instances = data['instances']   # list
+            self.found_files = data['found_files'] 
+
     def read_scenario(self, dn):
         '''
             read an ASlib scenario from disk
@@ -180,13 +261,30 @@ class ASlibScenario(object):
         '''
         self.logger.info("Read ASlib scenario: %s" % (dn))
 
-        # add command line arguments in metainfo
-        self.dir_ = dn
-        self.find_files()
-        self.read_files()
+        cachepath = self.cache_folder()
+        # tong start
+        
+        parts = dn.split("/")
+        scenario_name = parts[-2]
+        cachefile = ""
+        if "oasc_test_data" in parts:
+            cachefile = cachepath+"/test_"+scenario_name+".json"
+        else:
+            cachefile = cachepath+"/train_"+scenario_name+".json"
 
-        if self.CHECK_VALID:
-            self.check_data()
+        if not os.path.exists(cachefile):
+            print ("read and create cache files")
+            self.dir_ = dn
+            self.find_files()
+            self.read_files()
+
+            if self.CHECK_VALID:
+                self.check_data()
+
+            self.cacheSelf(cachefile)
+        else:
+            print ("load from cache")
+            self.loadSelf(cachefile)
 
     def find_files(self):
         '''

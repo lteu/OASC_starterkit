@@ -1,6 +1,6 @@
 import sys
 import logging
-
+import time as tm
 import numpy as np
 
 from aslib_scenario.aslib_scenario import ASlibScenario
@@ -88,17 +88,20 @@ class Stats(object):
             par10 = par1
 
         print(">>>>>>>>>>>>>>>>>>>>>")
-        self.logger.info("System: %.4f" %(par10 / n_samples))
-        self.logger.info("Oracle: %.4f" %(self.oracle_par10 / n_samples))
-        self.logger.info("SBS: %.4f" %(self.sbs_par10 / n_samples))
+        
         
         if self.maximize:
             self.logger.info("Gap closed: %.4f" %((par10 - self.sbs_par10) / (self.oracle_par10 - self.sbs_par10)))
+            print ('---')
             self.logger.info("Gap remaining: %.4f" %((self.oracle_par10 - par10) / (self.oracle_par10 - self.sbs_par10)))
         else:
             self.logger.info("Gap closed: %.4f" %((self.sbs_par10 - par10) / (self.sbs_par10 - self.oracle_par10)))
+            print ('---')
             self.logger.info("Gap remaining: %.4f" %((par10 - self.oracle_par10) / (self.sbs_par10 - self.oracle_par10)))
-            
+        self.logger.info("System: %.4f" %(par10 / n_samples))
+        self.logger.info("Oracle: %.4f" %(self.oracle_par10 / n_samples))
+        self.logger.info("SBS: %.4f" %(self.sbs_par10 / n_samples))
+
 class Validator(object):
 
     def __init__(self):
@@ -137,11 +140,10 @@ class Validator(object):
         if set(test_scenario.instances).difference(schedules.keys()):
             self.logger.error("Missing predictions for %s" %(set(test_scenario.instances).difference(schedules.keys())))
             sys.exit(1)
-            
+        
         stat.oracle_par10 = test_scenario.performance_data.min(axis=1).sum()
-        sbs = train_scenario.performance_data.sum(axis=0).argmin()
+        sbs = train_scenario.performance_data.sum(axis=0).idxmin()
         stat.sbs_par10 = test_scenario.performance_data.sum(axis=0)[sbs]
-
         for inst, schedule in schedules.items():
             self.logger.debug("Validate: %s on %s" % (schedule, inst))
 
@@ -177,7 +179,7 @@ class Validator(object):
                     solved = (time <= budget) and test_scenario.runstatus_data[algo][inst] == "ok"
                 self.logger.debug("Used time (so far): %f" %(used_time))
                 
-                if solved and used_time <= test_scenario.algorithm_cutoff_time:
+                if solved and used_time < test_scenario.algorithm_cutoff_time:
                     stat.solved += 1
                     stat.par1 += used_time
                     self.logger.info("Solved after %f" %(used_time))
@@ -235,7 +237,7 @@ class Validator(object):
         
         if test_scenario.maximize[0]: 
             stat.oracle_par10 = test_scenario.performance_data.max(axis=1).sum()
-            sbs = train_scenario.performance_data.sum(axis=0).argmax()
+            sbs = train_scenario.performance_data.sum(axis=0).idxmin()
             stat.sbs_par10 = test_scenario.performance_data.sum(axis=0)[sbs]
         else:
             stat.oracle_par10 = test_scenario.performance_data.min(axis=1).sum()

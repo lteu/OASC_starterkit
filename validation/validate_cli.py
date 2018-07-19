@@ -4,6 +4,7 @@
 import logging
 logging.basicConfig(level="INFO")
 import json
+import time as tm
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 from aslib_scenario.aslib_scenario import ASlibScenario
@@ -18,6 +19,7 @@ if __name__ == "__main__":
     
     args_ = parser.parse_args()
     
+    start_time_fold = tm.time()
     #read scenarios
     test_scenario = ASlibScenario()
     test_scenario.read_scenario(dn=args_.test_as)
@@ -34,3 +36,7 @@ if __name__ == "__main__":
         validator.validate_runtime(schedules=schedules, test_scenario=test_scenario, train_scenario=train_scenario)
     else:
         validator.validate_quality(schedules=schedules, test_scenario=test_scenario, train_scenario=train_scenario)
+
+
+    ex_time_fold = tm.strftime("%H:%M:%S", tm.gmtime(tm.time()-start_time_fold)) 
+    print(ex_time_fold)
