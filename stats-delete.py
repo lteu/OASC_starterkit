@@ -1,11 +1,14 @@
-'''
-A wrapper for original OASC evaluation
+#! /usr/bin/env python
 
-$: python stats.py ../path/to/result.json
-$: python stats.py ../path/to/result.json scenario_name
+'''
+
+python stats.py ../path/result.json
+
 
 comments
 ========
+Wrapper to use original OASC result evaluation
+
 Author: HearNest
 
 '''
@@ -21,18 +24,14 @@ def main(args):
     sys.exit('Missing Arg, E.g. python stats.py [file path in json, e.g. ../Bado.json]')
 
   jsonpath = args[0]
-  
+
   if not os.path.exists(jsonpath):
     print 'File not found',jsonpath
     sys.exit()
 
-  if len(args) == 2:
-    scenario = args[1]
-  else:
-    filename = jsonpath.split("/")[-1]
-    scenario =  filename.split(".")[0]
+  filename = jsonpath.split("/")[-1]
+  scenario =  filename.split(".")[0]
 
-  print 'Eval ',scenario,' ... '
 
   root_arr = os.path.realpath(__file__).split('/')[:-1]
   root = '/'.join(root_arr) 
