@@ -53,7 +53,15 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 # Flask stuff:
 instance/
 .webassets-cache
