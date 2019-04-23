@@ -264,13 +264,25 @@ class ASlibScenario(object):
         cachepath = self.cache_folder()
         # tong start
         
+        # get scenario_name from cmd line, it could be either test_1_1 or oasc scenario_name
+        if not dn.endswith(os.path.sep):
+            dn += os.path.sep
         parts = dn.split("/")
         scenario_name = parts[-2]
+        scenario_pfiss = parts[-1]
+
+        # get real scenario name from description
+        fn = os.path.join(dn, 'description.txt')
+        with open(fn, "r") as fh:
+            description = yaml.load(fh)
+        real_scenario = description.get('scenario_id')
+
+
         cachefile = ""
         if "oasc_test_data" in parts:
-            cachefile = cachepath+"/test_"+scenario_name+".json"
+            cachefile = cachepath+"/test_"+real_scenario+'_'+scenario_name+".json"
         else:
-            cachefile = cachepath+"/train_"+scenario_name+".json"
+            cachefile = cachepath+"/train_"+real_scenario+'_'+scenario_name+scenario_pfiss+".json"
 
         if not os.path.exists(cachefile):
             self.logger.debug("read and create cache files "+cachefile)

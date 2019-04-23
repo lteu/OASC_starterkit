@@ -88,13 +88,15 @@ class Stats(object):
             self.logger.info("Average Solution Quality: %.4f" % (par1 / n_samples))
             par10 = par1
 
-        print(">>>>>>>>>>>>>>>>>>>>>")
-        
+        closed_gap_score = (par10 - self.sbs_par10) / (self.oracle_par10 - self.sbs_par10)
+        print(">>>>>>>>>>>>>>>>hallo>>>>>")
+        print("Gap closed: %.4f" %(closed_gap_score)) # test
+
         self.logger.debug("System: %.4f" %(par10 / n_samples))
         self.logger.debug("Oracle: %.4f" %(self.oracle_par10 / n_samples))
         self.logger.debug("SBS: %.4f" %(self.sbs_par10 / n_samples))
         if self.maximize:
-            self.logger.info("Gap closed: %.4f" %((par10 - self.sbs_par10) / (self.oracle_par10 - self.sbs_par10)))
+            self.logger.info("Gap closed: %.4f" %(closed_gap_score))
             print ('---')
             self.logger.debug("Gap remaining: %.4f" %((self.oracle_par10 - par10) / (self.oracle_par10 - self.sbs_par10)))
         else:

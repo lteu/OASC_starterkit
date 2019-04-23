@@ -8,6 +8,10 @@ please call:
 e.g.
 ```python stats.py data/sunny/fkvar/Caren.json```
 
+
+
+Folder content of ``Data`` is to be filled.
+
 For installation, terms of use and more technical details, please refer to the [original repository ](https://github.com/mlindauer/OASC_starterkit)
 
 ##  Original Author
